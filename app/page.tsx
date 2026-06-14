@@ -212,6 +212,54 @@ export default function TTBLabelVerifier() {
     }
   };
 
+  // Load a demo batch of 5 identical "perfect" photos for the Batch Example section
+  const loadBatchExample = async (autoVerify: boolean) => {
+    const perfectSample = SAMPLE_CONFIGS[0];
+    const imagePath = perfectSample.imagePath;
+    const dataUrl = await publicImageToDataUrl(imagePath);
+    const templateData = clone(perfectSample.data as ApplicationData);
+
+    const items: BatchItem[] = Array.from({ length: 5 }, (_, i) => ({
+      id: generateId(),
+      file: null,
+      fileName: `perfect-bourbon-batch-${i + 1}.jpg`,
+      previewUrl: imagePath,
+      dataUrl,
+      data: templateData,
+      status: "idle" as const,
+    }));
+
+    setBatchItems(items);
+
+    if (autoVerify) {
+      // Perform verification live for the demo batch (reuses the same API call)
+      setIsBatchVerifying(true);
+      const updated = [...items];
+      for (let i = 0; i < updated.length; i++) {
+        updated[i] = { ...updated[i], status: "processing" as const };
+        setBatchItems([...updated]);
+        try {
+          const res = await fetch("/api/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: updated[i].dataUrl, data: updated[i].data }),
+          });
+          const json = await res.json();
+          if (!res.ok || json.error) throw new Error(json.error);
+          updated[i] = { ...updated[i], result: json.result, status: "done" as const };
+        } catch (e: any) {
+          updated[i] = { ...updated[i], status: "error" as const, error: e.message || "Failed" };
+        }
+        setBatchItems([...updated]);
+        await new Promise((r) => setTimeout(r, 200));
+      }
+      setIsBatchVerifying(false);
+      toast.success("Batch example verified (all clean)");
+    } else {
+      toast.success("Batch example loaded (5 identical clean photos)");
+    }
+  };
+
   // Standalone runner so we can auto-verify from sample without depending on the latest render closure
   const runVerificationWithData = async (dataUrl: string, data: ApplicationData) => {
     setIsVerifying(true);
@@ -1045,16 +1093,16 @@ export default function TTBLabelVerifier() {
                     <div className="p-3">
                       <div className="font-medium text-sm leading-tight mb-0.5">{sample.name}</div>
                       <div className="text-[11px] text-zinc-500 mb-2 line-clamp-2">{sample.description}</div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-1">
                         <button
                           onClick={() => loadSample(sample, false)}
-                          className="flex-1 text-xs btn btn-secondary py-1.5"
+                          className="flex-1 text-[10px] leading-tight btn btn-secondary py-1"
                         >
                           Load
                         </button>
                         <button
                           onClick={() => loadSample(sample, true)}
-                          className="flex-1 text-xs btn btn-primary py-1.5"
+                          className="flex-1 text-[10px] leading-tight btn btn-primary py-1"
                         >
                           Load + Verify
                         </button>
@@ -1083,7 +1131,24 @@ export default function TTBLabelVerifier() {
                   </div>
                 ))}
               </div>
-              <p className="text-[11px] text-center text-zinc-400 mt-3">Example of a clean batch of 5 identical labels. In real use, upload your own and use the template form above for the submitted application data.</p>
+
+              {/* Buttons for the entire batch example, same format as single samples */}
+              <div className="flex gap-1 mt-2">
+                <button
+                  onClick={() => loadBatchExample(false)}
+                  className="flex-1 text-[10px] leading-tight btn btn-secondary py-1"
+                >
+                  Load
+                </button>
+                <button
+                  onClick={() => loadBatchExample(true)}
+                  className="flex-1 text-[10px] leading-tight btn btn-primary py-1"
+                >
+                  Load + Verify
+                </button>
+              </div>
+
+              <p className="text-[11px] text-center text-zinc-400 mt-3">Example of a clean batch of 5 identical labels using the shared template. Click Load or Load + Verify to populate the batch list above (and verify if chosen).</p>
             </>
           )}
         </div>
