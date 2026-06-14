@@ -544,9 +544,9 @@ export default function TTBLabelVerifier() {
     <div className="min-h-screen bg-zinc-50">
       {/* Top bar */}
       <header className="border-b border-zinc-200 bg-white/80 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1e3a8a] text-white">
+        <div className="max-w-5xl mx-auto px-8 py-5 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1e3a8a] text-white">
               {/* Bottle with reading glasses - "proof reading" the label (pun + Culture Mind energy) */}
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -581,20 +581,20 @@ export default function TTBLabelVerifier() {
               </svg>
             </div>
             <div>
-              <div className="font-semibold tracking-tight text-xl">Very Little Proof Indeed</div>
-              <div className="text-[10px] text-zinc-500 -mt-0.5">TTB LABEL VERIFICATION • AI PROTOTYPE</div>
+              <div className="font-semibold tracking-tight text-2xl">Very Little Proof Indeed</div>
+              <div className="text-xs text-zinc-500 -mt-0.5">TTB LABEL VERIFICATION • AI PROTOTYPE</div>
             </div>
           </div>
-          <div className="flex items-center gap-3 text-sm">
-            <div className="hidden sm:flex items-center gap-2 rounded-full bg-emerald-100 text-emerald-800 px-3 py-0.5 text-xs font-medium">
-              <Zap className="h-3.5 w-3.5" /> Target &lt; 5 seconds
+          <div className="flex items-center gap-4 text-base">
+            <div className="hidden sm:flex items-center gap-2 rounded-full bg-emerald-100 text-emerald-800 px-4 py-1 text-sm font-medium">
+              <Zap className="h-4 w-4" /> Target &lt; 5 seconds
             </div>
-            <div className="rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs text-zinc-600">
+            <div className="rounded-full border border-zinc-200 bg-white px-4 py-1.5 text-sm text-zinc-600">
               No data stored
             </div>
             <button
               onClick={resetSingle}
-              className="btn btn-ghost text-sm px-3 py-1.5"
+              className="btn btn-ghost text-base px-4 py-2"
               title="Clear everything and start fresh"
             >
               Start over
@@ -603,38 +603,38 @@ export default function TTBLabelVerifier() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-10">
+      <main className="max-w-5xl mx-auto px-8 py-12">
         {/* Hero / Context */}
-        <div className="mb-10 text-center max-w-2xl mx-auto">
-          <h1 className="text-4xl font-semibold tracking-tighter text-balance">
+        <div className="mb-12 text-center max-w-2xl mx-auto">
+          <h1 className="text-5xl font-semibold tracking-tighter text-balance">
             Very Little Proof Indeed
           </h1>
-          <p className="mt-2 text-xl text-zinc-700 tracking-tight">
+          <p className="mt-2 text-2xl text-zinc-700 tracking-tight">
             AI-powered alcohol label verification for TTB
           </p>
-          <p className="mt-4 text-lg text-zinc-600">
+          <p className="mt-4 text-xl text-zinc-600">
             A fast, simple prototype built for the Treasury TTB compliance workflow. 
             Drag in a label photo, enter the submitted values, and get a structured comparison in ~3–6 seconds — with special (and very strict) attention to the exact Government Warning requirements.
           </p>
-          <p className="mt-2 text-sm text-zinc-500">
+          <p className="mt-2 text-base text-zinc-500">
             Based on discovery sessions with agents. Designed to be obvious for everyone from new hires to 28-year veterans. <span className="italic">(Culture Mind naming approved.)</span>
           </p>
         </div>
 
         {/* Tabs - addressing the "batch uploads would be huge" from the spec notes */}
-        <div className="flex gap-1 mb-4 border-b border-zinc-200">
-          <button onClick={() => setActiveTab('single')} className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'single' ? 'border-b-2 border-[#1e3a8a] text-[#1e3a8a]' : 'text-zinc-500 hover:text-zinc-700'}`}>Single Label Verification</button>
-          <button onClick={() => setActiveTab('batch')} className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'batch' ? 'border-b-2 border-[#1e3a8a] text-[#1e3a8a]' : 'text-zinc-500 hover:text-zinc-700'}`}>Batch Upload (max {MAX_BATCH})</button>
+        <div className="flex gap-1 mb-5 border-b border-zinc-200">
+          <button onClick={() => setActiveTab('single')} className={`px-5 py-2.5 text-base font-medium transition-colors ${activeTab === 'single' ? 'border-b-2 border-[#1e3a8a] text-[#1e3a8a]' : 'text-zinc-500 hover:text-zinc-700'}`}>Single Label Verification</button>
+          <button onClick={() => setActiveTab('batch')} className={`px-5 py-2.5 text-base font-medium transition-colors ${activeTab === 'batch' ? 'border-b-2 border-[#1e3a8a] text-[#1e3a8a]' : 'text-zinc-500 hover:text-zinc-700'}`}>Batch Upload (max {MAX_BATCH})</button>
         </div>
 
         {/* SINGLE VERIFICATION — the primary, beautiful, snappy experience */}
-        <div className="card p-8 mb-8" style={{ display: activeTab === 'single' ? 'block' : 'none' }}>
+        <div className="card p-10 mb-10" style={{ display: activeTab === 'single' ? 'block' : 'none' }}>
           <div className="flex items-center justify-between mb-6">
             <div>
               <div className="font-semibold text-2xl tracking-tight">Single Label Verification</div>
               <div className="text-sm text-zinc-500">Primary workflow • Fast • Clear results • <span className="italic">Very Little Proof Indeed</span></div>
             </div>
-            <button onClick={resetSingle} className="btn btn-ghost text-sm">Clear form</button>
+            <button onClick={resetSingle} className="btn btn-ghost text-base">Clear form</button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
@@ -801,7 +801,7 @@ export default function TTBLabelVerifier() {
             <button
               onClick={runVerification}
               disabled={!canVerify || isVerifying}
-              className="btn btn-primary text-base px-10 py-3.5 w-full max-w-md shadow-sm disabled:opacity-60"
+              className="btn btn-primary text-lg px-12 py-4 w-full max-w-md shadow-sm disabled:opacity-60"
             >
               {isVerifying ? (
                 <span className="flex items-center gap-2">
@@ -887,7 +887,7 @@ export default function TTBLabelVerifier() {
                     <div className="text-sm opacity-90 mt-0.5">{result.readabilityNote}</div>
                   )}
                 </div>
-                <button onClick={reverify} className="ml-auto btn btn-secondary text-xs px-3 py-1 self-start">
+                <button onClick={reverify} className="ml-auto btn btn-secondary text-sm px-4 py-1.5 self-start">
                   <RefreshCw className="h-3.5 w-3.5 mr-1" /> Re-verify
                 </button>
               </div>
@@ -961,10 +961,10 @@ export default function TTBLabelVerifier() {
               </div>
 
               <div className="flex justify-center gap-3 pt-2">
-                <button onClick={reverify} className="btn btn-secondary">
+                <button onClick={reverify} className="btn btn-secondary text-base px-4 py-2">
                   <RefreshCw className="h-4 w-4 mr-2" /> Re-run verification with current values
                 </button>
-                <button onClick={resetSingle} className="btn btn-ghost">
+                <button onClick={resetSingle} className="btn btn-ghost text-base px-4 py-2">
                   Start a new verification
                 </button>
               </div>
@@ -974,7 +974,7 @@ export default function TTBLabelVerifier() {
         </div>
 
         {/* BATCH UPLOAD CARD - limited to 5 for prototype (API cost control) and addresses the "batch uploads would be huge" note from discovery */}
-        <div className="card p-8 mb-8" style={{ display: activeTab === 'batch' ? 'block' : 'none' }}>
+        <div className="card p-10 mb-10" style={{ display: activeTab === 'batch' ? 'block' : 'none' }}>
           <div className="flex items-center justify-between mb-6">
             <div>
               <div className="font-semibold text-2xl tracking-tight">Batch Upload (max {MAX_BATCH})</div>
@@ -1004,7 +1004,7 @@ export default function TTBLabelVerifier() {
                 <input className="input text-sm" placeholder="750 mL" value={batchTemplate.netContents} onChange={(e) => updateBatchTemplate("netContents", e.target.value)} />
               </div>
             </div>
-            <button onClick={applyTemplateToBatch} className="mt-3 btn btn-secondary text-xs px-3 py-1">Apply template to all items</button>
+            <button onClick={applyTemplateToBatch} className="mt-3 btn btn-secondary text-sm px-4 py-1.5">Apply template to all items</button>
           </div>
 
           {/* Multi-file upload for batch */}
@@ -1091,7 +1091,7 @@ export default function TTBLabelVerifier() {
           <button
             onClick={verifyBatch}
             disabled={batchItems.length === 0 || isBatchVerifying}
-            className="btn btn-primary w-full max-w-sm mx-auto block disabled:opacity-60"
+            className="btn btn-primary text-lg w-full max-w-sm mx-auto block disabled:opacity-60"
           >
             {isBatchVerifying ? "Verifying batch..." : `Verify Batch (${batchItems.length}/${MAX_BATCH})`}
           </button>
@@ -1099,7 +1099,7 @@ export default function TTBLabelVerifier() {
         </div>
 
         {/* Samples / Batch Example at bottom - replaced based on tab */}
-        <div className="mt-12">
+        <div className="mt-14">
           {activeTab === 'single' ? (
             <>
               <div className="flex items-end justify-between mb-3">
@@ -1128,13 +1128,13 @@ export default function TTBLabelVerifier() {
                       <div className="flex gap-1">
                         <button
                           onClick={() => loadSample(sample, false)}
-                          className="flex-1 text-[10px] leading-tight btn btn-secondary py-1"
+                          className="flex-1 text-xs leading-tight btn btn-secondary py-1.5"
                         >
                           Load
                         </button>
                         <button
                           onClick={() => loadSample(sample, true)}
-                          className="flex-1 text-[10px] leading-tight btn btn-primary py-1"
+                          className="flex-1 text-xs leading-tight btn btn-primary py-1.5"
                         >
                           Load + Verify
                         </button>
@@ -1168,13 +1168,13 @@ export default function TTBLabelVerifier() {
               <div className="flex gap-1 mt-2">
                 <button
                   onClick={() => loadBatchExample(false)}
-                  className="flex-1 text-[10px] leading-tight btn btn-secondary py-1"
+                  className="flex-1 text-xs leading-tight btn btn-secondary py-1.5"
                 >
                   Load
                 </button>
                 <button
                   onClick={() => loadBatchExample(true)}
-                  className="flex-1 text-[10px] leading-tight btn btn-primary py-1"
+                  className="flex-1 text-xs leading-tight btn btn-primary py-1.5"
                 >
                   Load + Verify
                 </button>
