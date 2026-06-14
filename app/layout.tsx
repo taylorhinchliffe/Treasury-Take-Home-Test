@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TTB Label Verification | AI Prototype",
-  description: "Fast, simple AI-powered tool to verify alcohol beverage labels against submitted application data. A standalone prototype for the Department of the Treasury TTB compliance workflow evaluation.",
+  title: "Very Little Proof Indeed | TTB Label Verification",
+  description: "Very Little Proof Indeed — Fast, simple AI-powered prototype for verifying alcohol beverage labels against submitted application data. Built for the Department of the Treasury TTB compliance workflow evaluation (with strict Government Warning handling).",
   icons: {
     icon: "/favicon.ico",
   },

@@ -1,8 +1,8 @@
 {
-  "name": "ttb-label-verifier-prototype",
+  "name": "very-little-proof-indeed",
   "version": "0.1.0",
   "private": true,
-  "description": "AI-powered Alcohol Label Verification prototype for TTB/Treasury take-home assessment. Beautiful, snappy, simple web app for verifying label images against submitted application data.",
+  "description": "Very Little Proof Indeed — AI-powered alcohol label verification prototype for TTB/Treasury. A fast, simple, Culture-class tool for verifying labels against application data (with strict Government Warning checks).",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

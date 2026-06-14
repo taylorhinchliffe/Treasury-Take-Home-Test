@@ -413,8 +413,8 @@ export default function TTBLabelVerifier() {
               <FileText className="h-5 w-5" />
             </div>
             <div>
-              <div className="font-semibold tracking-tight text-xl">TTB Label Verification</div>
-              <div className="text-[10px] text-zinc-500 -mt-0.5">AI PROTOTYPE</div>
+              <div className="font-semibold tracking-tight text-xl">Very Little Proof Indeed</div>
+              <div className="text-[10px] text-zinc-500 -mt-0.5">TTB LABEL VERIFICATION • AI PROTOTYPE</div>
             </div>
           </div>
           <div className="flex items-center gap-3 text-sm">
@@ -439,14 +439,17 @@ export default function TTBLabelVerifier() {
         {/* Hero / Context */}
         <div className="mb-10 text-center max-w-2xl mx-auto">
           <h1 className="text-4xl font-semibold tracking-tighter text-balance">
-            Verify alcohol labels against application data
+            Very Little Proof Indeed
           </h1>
-          <p className="mt-3 text-lg text-zinc-600">
+          <p className="mt-2 text-xl text-zinc-700 tracking-tight">
+            AI-powered alcohol label verification for TTB
+          </p>
+          <p className="mt-4 text-lg text-zinc-600">
             A fast, simple prototype built for the Treasury TTB compliance workflow. 
-            Drag in a label photo, enter the submitted values, and get an instant structured comparison — with special attention to the exact Government Warning requirements.
+            Drag in a label photo, enter the submitted values, and get an instant structured comparison — with special (and very strict) attention to the exact Government Warning requirements.
           </p>
           <p className="mt-2 text-sm text-zinc-500">
-            Based on discovery sessions with agents. Designed to be obvious for everyone from new hires to 28-year veterans.
+            Based on discovery sessions with agents. Designed to be obvious for everyone from new hires to 28-year veterans. <span className="italic">(Culture Mind naming approved.)</span>
           </p>
         </div>
 
