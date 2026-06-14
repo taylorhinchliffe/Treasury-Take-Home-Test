@@ -107,10 +107,12 @@ export async function verifyLabel(
 ): Promise<VerificationResult> {
   const client = getClient();
 
-  // Use a strong vision model. 
-  // Default to Grok (xAI) since user prefers it and has XAI_API_KEY funded.
-  // Grok vision is excellent for this task. If you want maximum speed you can override with VISION_MODEL=gpt-4o-mini (OpenAI fallback still supported).
-  const model = process.env.VISION_MODEL || "grok-4";
+  // Use the best and fastest Grok model available.
+  // Grok 4.3 is the current flagship: most intelligent and fastest model from xAI (multimodal, supports vision for image understanding).
+  // This is recommended for Premium+ accounts. Use exactly "grok-4.3" (or check console.x.ai for any newer variant).
+  // If you want to experiment with even faster variants, set VISION_MODEL in env (e.g. a fast-reasoning variant if available).
+  // OpenAI fallback is still supported but we default to Grok as requested.
+  const model = process.env.VISION_MODEL || "grok-4.3";
 
   const userContent = [
     {

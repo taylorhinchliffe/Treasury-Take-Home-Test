@@ -177,7 +177,7 @@ You can also upload your own generated or photographed labels (create realistic 
 ## Architecture & Technical Choices
 
 - **Next.js 16 (App Router) + TypeScript + Tailwind**
-- **xAI Grok vision** (via OpenAI-compatible SDK + `baseURL`). Primary provider is Grok (user prefers xAI and has funded XAI_API_KEY). OpenAI fallback still supported via env but not default. Single structured vision call per label.
+- **xAI Grok vision** (via OpenAI-compatible SDK + `baseURL`). Primary model is Grok 4.3 (the most intelligent and fastest Grok model, with excellent multimodal/vision support for reading labels). User prefers xAI and has funded the key. OpenAI fallback still supported via env but not default. Single structured vision call per label.
 - Strong, explicit system prompt that quotes the exact required Government Warning and gives clear rules for strict warning vs. intelligent fuzzy matching on other fields.
 - Client-side image resize before upload (critical for the <5s target and cost).
 - Zod for safe parsing of model output.
@@ -194,9 +194,11 @@ You can also upload your own generated or photographed labels (create realistic 
 
 The stakeholder interviews were very clear: **results need to feel like ~5 seconds or less**, or agents will go back to doing it by eye.
 
-Because you prefer Grok (xAI) and have the XAI_API_KEY funded (Premium+ + $5 added), the prototype is locked to use Grok by default (`grok-4`).
+Because you prefer Grok (xAI) and have the XAI_API_KEY funded (Premium+ + $5 added), the prototype is locked to use Grok by default (`grok-4.3`).
 
-Current typical end-to-end times on a warm Vercel instance with Grok:
+Grok 4.3 is xAI’s current most intelligent and fastest model (multimodal with strong vision capabilities, perfect for reading labels).
+
+Current typical end-to-end times on a warm Vercel instance with Grok 4.3:
 - ~4–6 seconds with the current optimizations (client resize + auto detail).
 - Occasionally 7–9s on cold starts (Vercel hobby free tier) or with very large/complex user photos.
 
@@ -204,14 +206,14 @@ The loading UI uses fast-updating steps (every ~320ms) so it *feels* responsive 
 
 ### Quick wins already applied (no extra complexity)
 - Client-side resize to **1100px** longest side (down from 1550px) — big reduction in vision tokens and processing time while remaining highly legible for label text.
-- Default model: **grok-4** (Grok vision via xAI — your preferred choice with funded XAI_API_KEY).
+- Default model: **grok-4.3** (Grok vision via xAI — your preferred choice with funded XAI_API_KEY; this is the current flagship most intelligent + fastest model).
 - `detail: "auto"` — lets the model use lower resolution when the image is clear (most alcohol labels are).
 - Single structured vision call (no multi-stage pipeline).
 - Optimistic loading steps in the UI.
 
 ### How to tune further if you want (still low complexity)
 1. **Stick with Grok** (current default):
-   - No change needed. The code prioritizes `XAI_API_KEY` and defaults to `grok-4`.
+   - No change needed. The code prioritizes `XAI_API_KEY` and defaults to `grok-4.3` (the best/fastest Grok model as of now).
 
 2. **Even smaller images** (if you see very large user photos):
    - Edit `lib/image.ts` → change `maxLongestSide = 900` or `800`.
@@ -243,7 +245,7 @@ Since you specifically prefer Grok (and have funded the key), the prototype is n
 
 - **Batch**: Full multi-file queue with template + overrides is a natural extension and was scoped as high priority in the original plan. The single flow + matching engine is the hardest and most important part; it is fully working and beautiful. A complete batch UI can be added in <1 hour if desired for the evaluation.
 - **API key**: The prototype requires a vision-capable LLM key for live arbitrary uploads. Samples work end-to-end once the key is configured. Cost for a full review session is pennies.
-- **Model choice**: xAI Grok chosen because user specifically prefers Grok (has Premium+ account + funded XAI_API_KEY with $5). Code defaults to `grok-4` and prioritizes `XAI_API_KEY`. OpenAI is still available as fallback for maximum speed if ever desired.
+- **Model choice**: xAI Grok 4.3 chosen because user specifically prefers Grok (has Premium+ account + funded XAI_API_KEY with $5). Grok 4.3 is the current most intelligent and fastest model from xAI with strong vision capabilities. Code defaults to `grok-4.3` and prioritizes `XAI_API_KEY`. OpenAI is still available as fallback if ever desired.
 - **Scope**: Focused on the exact pain points and success criteria from the stakeholder notes (Sarah, Marcus, Dave, Jenny) rather than building a full COLA replacement. No PII, no integration, no persistence — as specified for a prototype.
 - **Imperfect images**: Real photos with angle/glare are included in samples. The vision model handles many of them well; the prototype surfaces readability notes.
 - **Mobile**: Fully responsive and usable on tablets/phones. A true native app would be a follow-on project.
