@@ -567,16 +567,19 @@ export default function TTBLabelVerifier() {
                   <rect x="8" y="1.8" width="8" height="2" rx="0.5" />
                   {/* Label hint */}
                   <rect x="7.5" y="10.5" width="9" height="6" rx="1" />
-                  {/* Left lens (reading glasses) */}
-                  <rect x="5" y="9.5" width="4.5" height="3.2" rx="0.7" stroke="black" />
-                  {/* Right lens */}
-                  <rect x="14.5" y="9.5" width="4.5" height="3.2" rx="0.7" stroke="black" />
-                  {/* Bridge */}
-                  <line x1="9.5" y1="11.1" x2="14.5" y2="11.1" stroke="black" />
-                  {/* Left temple arm */}
-                  <line x1="5" y1="11.1" x2="3" y2="10" stroke="black" />
-                  {/* Right temple arm */}
-                  <line x1="19" y1="11.1" x2="21" y2="10" stroke="black" />
+                  {/* Glasses - slightly larger overall again with sub-group scale (1.05), line width value kept the same at 1.0 */}
+                  <g transform="scale(1.05)">
+                    {/* Left lens (reading glasses) */}
+                    <rect x="4.3" y="8.9" width="5.4" height="3.9" rx="0.7" stroke="black" />
+                    {/* Right lens */}
+                    <rect x="14.3" y="9.3" width="5" height="3.5" rx="0.7" stroke="black" />
+                    {/* Bridge */}
+                    <line x1="9.7" y1="11" x2="14.3" y2="11" stroke="black" />
+                    {/* Left temple arm */}
+                    <line x1="4.7" y1="11" x2="2.7" y2="9.7" stroke="black" />
+                    {/* Right temple arm */}
+                    <line x1="19.3" y1="11" x2="21.3" y2="9.7" stroke="black" />
+                  </g>
                 </g>
               </svg>
             </div>
