@@ -546,7 +546,7 @@ export default function TTBLabelVerifier() {
       <header className="border-b border-zinc-200 bg-white/80 backdrop-blur sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-8 py-5 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1e3a8a] text-white">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#3b82f6] text-white">
               {/* Bottle with reading glasses - "proof reading" the label (pun + Culture Mind energy) */}
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -568,15 +568,15 @@ export default function TTBLabelVerifier() {
                   {/* Label hint */}
                   <rect x="7.5" y="10.5" width="9" height="6" rx="1" />
                   {/* Left lens (reading glasses) */}
-                  <rect x="5" y="9.5" width="4.5" height="3.2" rx="0.7" />
+                  <rect x="5" y="9.5" width="4.5" height="3.2" rx="0.7" stroke="black" />
                   {/* Right lens */}
-                  <rect x="14.5" y="9.5" width="4.5" height="3.2" rx="0.7" />
+                  <rect x="14.5" y="9.5" width="4.5" height="3.2" rx="0.7" stroke="black" />
                   {/* Bridge */}
-                  <line x1="9.5" y1="11.1" x2="14.5" y2="11.1" />
+                  <line x1="9.5" y1="11.1" x2="14.5" y2="11.1" stroke="black" />
                   {/* Left temple arm */}
-                  <line x1="5" y1="11.1" x2="3" y2="10" />
+                  <line x1="5" y1="11.1" x2="3" y2="10" stroke="black" />
                   {/* Right temple arm */}
-                  <line x1="19" y1="11.1" x2="21" y2="10" />
+                  <line x1="19" y1="11.1" x2="21" y2="10" stroke="black" />
                 </g>
               </svg>
             </div>
