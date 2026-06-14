@@ -8,7 +8,6 @@ import {
   X,
   RefreshCw,
   Eye,
-  FileText,
   Zap,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -548,7 +547,36 @@ export default function TTBLabelVerifier() {
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1e3a8a] text-white">
-              <FileText className="h-5 w-5" />
+              {/* Bottle with reading glasses - "proof reading" the label (pun + Culture Mind energy) */}
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-5 w-5" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="1.9" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                {/* Bottle body - bourbon style */}
+                <rect x="5.5" y="7.5" width="13" height="13.5" rx="2" />
+                {/* Neck */}
+                <rect x="8.5" y="3.5" width="7" height="5" rx="1" />
+                {/* Cap */}
+                <rect x="8" y="1.8" width="8" height="2" rx="0.5" />
+                {/* Label hint */}
+                <rect x="7.5" y="10.5" width="9" height="6" rx="1" />
+                {/* Left lens (reading glasses) */}
+                <rect x="5" y="9.5" width="4.5" height="3.2" rx="0.7" />
+                {/* Right lens */}
+                <rect x="14.5" y="9.5" width="4.5" height="3.2" rx="0.7" />
+                {/* Bridge */}
+                <line x1="9.5" y1="11.1" x2="14.5" y2="11.1" />
+                {/* Left temple arm */}
+                <line x1="5" y1="11.1" x2="3" y2="10" />
+                {/* Right temple arm */}
+                <line x1="19" y1="11.1" x2="21" y2="10" />
+              </svg>
             </div>
             <div>
               <div className="font-semibold tracking-tight text-xl">Very Little Proof Indeed</div>
