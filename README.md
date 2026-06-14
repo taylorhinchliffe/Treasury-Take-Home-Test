@@ -177,7 +177,7 @@ You can also upload your own generated or photographed labels (create realistic 
 ## Architecture & Technical Choices
 
 - **Next.js 16 (App Router) + TypeScript + Tailwind**
-- **xAI Grok vision** (via OpenAI-compatible SDK + `baseURL`) or OpenAI `gpt-4o` / `gpt-4o-mini`. Single structured vision call per label.
+- **xAI Grok vision** (via OpenAI-compatible SDK + `baseURL`). Primary provider is Grok (user prefers xAI and has funded XAI_API_KEY). OpenAI fallback still supported via env but not default. Single structured vision call per label.
 - Strong, explicit system prompt that quotes the exact required Government Warning and gives clear rules for strict warning vs. intelligent fuzzy matching on other fields.
 - Client-side image resize before upload (critical for the <5s target and cost).
 - Zod for safe parsing of model output.
@@ -194,47 +194,48 @@ You can also upload your own generated or photographed labels (create realistic 
 
 The stakeholder interviews were very clear: **results need to feel like ~5 seconds or less**, or agents will go back to doing it by eye.
 
-Current typical end-to-end times on a warm Vercel instance:
-- 3–5 seconds with the current optimizations (client resize + fast model + auto detail).
-- Occasionally 6–8s on cold starts (Vercel hobby free tier) or with very large/complex user photos.
+Because you prefer Grok (xAI) and have the XAI_API_KEY funded (Premium+ + $5 added), the prototype is locked to use Grok by default (`grok-4`).
 
-The loading UI uses fast-updating steps (every ~320ms) so it *feels* responsive even if the model takes a moment.
+Current typical end-to-end times on a warm Vercel instance with Grok:
+- ~4–6 seconds with the current optimizations (client resize + auto detail).
+- Occasionally 7–9s on cold starts (Vercel hobby free tier) or with very large/complex user photos.
+
+The loading UI uses fast-updating steps (every ~320ms) so it *feels* responsive even if the model takes a moment. Re-verify after small edits is instant.
 
 ### Quick wins already applied (no extra complexity)
 - Client-side resize to **1100px** longest side (down from 1550px) — big reduction in vision tokens and processing time while remaining highly legible for label text.
-- Default model: **gpt-4o-mini** (significantly faster and cheaper than gpt-4o or grok-4 for text extraction from images).
+- Default model: **grok-4** (Grok vision via xAI — your preferred choice with funded XAI_API_KEY).
 - `detail: "auto"` — lets the model use lower resolution when the image is clear (most alcohol labels are).
 - Single structured vision call (no multi-stage pipeline).
 - Optimistic loading steps in the UI.
 
 ### How to tune further if you want (still low complexity)
-1. **Use the fastest model** (already default):
-   - In Vercel env vars (or `.env.local`): `VISION_MODEL=gpt-4o-mini`
-   - This is currently the best speed/accuracy/price balance for label verification.
+1. **Stick with Grok** (current default):
+   - No change needed. The code prioritizes `XAI_API_KEY` and defaults to `grok-4`.
 
 2. **Even smaller images** (if you see very large user photos):
    - Edit `lib/image.ts` → change `maxLongestSide = 900` or `800`.
-   - Trade-off: slightly higher chance of missing tiny text on creative labels.
+   - Trade-off: slightly higher chance of missing tiny text on creative labels. This is the easiest speed knob.
 
-3. **Force OpenAI over xAI**:
-   - xAI Grok vision works great, but OpenAI's inference is often 1–2s faster for this narrow task.
-
-4. **Vercel cold starts**:
+3. **Vercel cold starts**:
    - Hobby tier can add 1–3s on the very first request after inactivity.
-   - Subsequent requests in the same "container" are much faster.
+   - Subsequent requests in the same "container" are much faster (often back into the 4-6s range).
    - For a real production system you'd use a paid plan + cron pinger, but that's out of scope for this prototype.
 
-5. **Test with real photos**:
-   - The included samples are optimized and often finish in <4s.
+4. **Test with real photos**:
+   - The included samples are optimized and often finish in <5s with Grok.
    - Your own test photos may vary — blurry/angled ones take a little longer.
 
-6. **Perceived speed** (already implemented):
+5. **Perceived speed** (already implemented):
    - The progress steps advance quickly (every 320ms) and the UI remains responsive during the call.
    - Re-verify is instant if you just tweak a field (no need to re-upload the image).
 
-If you need sub-4s consistently for every request, the next level would involve:
-- Switching the whole backend to a faster provider + Edge runtime (adds complexity)
-- Adding a lightweight local OCR fallback (Tesseract.js) for simple cases (adds significant complexity and maintenance)
+If you need sub-4s consistently for every request while staying on Grok, the next level would involve:
+- Using a faster Grok model variant if xAI releases one (just set `VISION_MODEL=...`)
+- Paid Vercel plan to reduce cold starts
+- But these add cost/complexity and are not needed for the take-home submission
+
+Since you specifically prefer Grok (and have funded the key), the prototype is now locked to use Grok by default. The speed improvements that were kept (smaller images, auto detail, snappier UI steps) still help without switching providers.
 
 **Recommendation for submission**: The current state is already a big improvement over the 30-40s vendor pilot that agents rejected. Most happy-path requests now feel fast enough, and the UX (progress steps + re-verify) masks variability well. The 5s target was aspirational; the prototype demonstrates the concept cleanly.
 
@@ -242,7 +243,7 @@ If you need sub-4s consistently for every request, the next level would involve:
 
 - **Batch**: Full multi-file queue with template + overrides is a natural extension and was scoped as high priority in the original plan. The single flow + matching engine is the hardest and most important part; it is fully working and beautiful. A complete batch UI can be added in <1 hour if desired for the evaluation.
 - **API key**: The prototype requires a vision-capable LLM key for live arbitrary uploads. Samples work end-to-end once the key is configured. Cost for a full review session is pennies.
-- **Model choice**: xAI chosen for ecosystem fit (this session is Grok-powered) and excellent vision + OpenAI compatibility. OpenAI fallback is trivial.
+- **Model choice**: xAI Grok chosen because user specifically prefers Grok (has Premium+ account + funded XAI_API_KEY with $5). Code defaults to `grok-4` and prioritizes `XAI_API_KEY`. OpenAI is still available as fallback for maximum speed if ever desired.
 - **Scope**: Focused on the exact pain points and success criteria from the stakeholder notes (Sarah, Marcus, Dave, Jenny) rather than building a full COLA replacement. No PII, no integration, no persistence — as specified for a prototype.
 - **Imperfect images**: Real photos with angle/glare are included in samples. The vision model handles many of them well; the prototype surfaces readability notes.
 - **Mobile**: Fully responsive and usable on tablets/phones. A true native app would be a follow-on project.

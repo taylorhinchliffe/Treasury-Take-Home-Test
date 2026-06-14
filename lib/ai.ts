@@ -108,9 +108,9 @@ export async function verifyLabel(
   const client = getClient();
 
   // Use a strong vision model. 
-  // Default to gpt-4o-mini for best speed/price/latency on text extraction tasks (often 2-4s faster than larger models).
-  // Set VISION_MODEL=grok-4 (or another xAI model) in env if you prefer to use xAI for the Grok branding.
-  const model = process.env.VISION_MODEL || "gpt-4o-mini";
+  // Default to Grok (xAI) since user prefers it and has XAI_API_KEY funded.
+  // Grok vision is excellent for this task. If you want maximum speed you can override with VISION_MODEL=gpt-4o-mini (OpenAI fallback still supported).
+  const model = process.env.VISION_MODEL || "grok-4";
 
   const userContent = [
     {
