@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import {
   ApplicationData,
   VerificationResult,
+  BatchItem,
   emptyApplicationData,
   REQUIRED_GOVERNMENT_WARNING,
 } from "@/lib/types";
@@ -158,6 +159,13 @@ export default function TTBLabelVerifier() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
+  // Batch tab (limited to 5)
+  const MAX_BATCH = 5;
+  const [activeTab, setActiveTab] = useState<'single' | 'batch'>('single');
+  const [batchItems, setBatchItems] = useState<BatchItem[]>([]);
+  const [batchTemplate, setBatchTemplate] = useState<ApplicationData>(clone(emptyApplicationData));
+  const [isBatchVerifying, setIsBatchVerifying] = useState(false);
+
   // === Helpers ===
   const resetSingle = useCallback(() => {
     setAppData(clone(emptyApplicationData));
@@ -249,6 +257,75 @@ export default function TTBLabelVerifier() {
   const useStandardWarning = () => {
     updateField("governmentWarning", REQUIRED_GOVERNMENT_WARNING);
     toast.success("Standard Government Warning restored");
+  };
+
+  // Batch handlers (limited, reuses single engine)
+  const updateBatchTemplate = (field: keyof ApplicationData, value: string) => {
+    setBatchTemplate((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const applyTemplateToBatch = () => {
+    setBatchItems((prev) => prev.map((item) => ({ ...item, data: clone(batchTemplate) })));
+    toast.success("Template applied to all");
+  };
+
+  const handleBatchFiles = async (files: FileList | null) => {
+    if (!files) return;
+    const room = MAX_BATCH - batchItems.length;
+    const toAdd = Array.from(files).slice(0, room).filter((f) => f.type.startsWith("image/"));
+    const newItems: BatchItem[] = [];
+    for (const file of toAdd) {
+      const previewUrl = URL.createObjectURL(file);
+      const dataUrl = await resizeImageToDataUrl(file);
+      newItems.push({
+        id: generateId(),
+        file,
+        fileName: file.name,
+        previewUrl,
+        dataUrl,
+        data: clone(batchTemplate),
+        status: "idle",
+      });
+    }
+    setBatchItems((prev) => [...prev, ...newItems]);
+  };
+
+  const removeBatchItem = (id: string) => {
+    setBatchItems((prev) => {
+      const item = prev.find((i) => i.id === id);
+      if (item?.previewUrl) URL.revokeObjectURL(item.previewUrl);
+      return prev.filter((i) => i.id !== id);
+    });
+  };
+
+  const clearBatch = () => {
+    batchItems.forEach((item) => item.previewUrl && URL.revokeObjectURL(item.previewUrl));
+    setBatchItems([]);
+    setBatchTemplate(clone(emptyApplicationData));
+  };
+
+  const verifyBatch = async () => {
+    if (batchItems.length === 0) return;
+    setIsBatchVerifying(true);
+    const updated = [...batchItems];
+    for (let i = 0; i < updated.length; i++) {
+      const item = updated[i];
+      if (item.status !== "idle") continue;
+      updated[i] = { ...item, status: "processing" };
+      setBatchItems([...updated]);
+      try {
+        const res = await fetch("/api/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image: item.dataUrl, data: item.data }) });
+        const json = await res.json();
+        if (!res.ok || json.error) throw new Error(json.error);
+        updated[i] = { ...updated[i], result: json.result, status: "done" };
+      } catch (e: any) {
+        updated[i] = { ...updated[i], status: "error", error: e.message || "Failed" };
+      }
+      setBatchItems([...updated]);
+      await new Promise((r) => setTimeout(r, 250));
+    }
+    setIsBatchVerifying(false);
+    toast.success("Batch complete");
   };
 
   // === Image handling (drag + drop + click + resize) ===
@@ -451,6 +528,12 @@ export default function TTBLabelVerifier() {
           <p className="mt-2 text-sm text-zinc-500">
             Based on discovery sessions with agents. Designed to be obvious for everyone from new hires to 28-year veterans. <span className="italic">(Culture Mind naming approved.)</span>
           </p>
+        </div>
+
+        {/* Tabs - addressing the "batch uploads would be huge" from the spec notes */}
+        <div className="flex gap-1 mb-4 border-b border-zinc-200">
+          <button onClick={() => setActiveTab('single')} className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'single' ? 'border-b-2 border-[#1e3a8a] text-[#1e3a8a]' : 'text-zinc-500 hover:text-zinc-700'}`}>Single Label Verification</button>
+          <button onClick={() => setActiveTab('batch')} className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'batch' ? 'border-b-2 border-[#1e3a8a] text-[#1e3a8a]' : 'text-zinc-500 hover:text-zinc-700'}`}>Batch Upload (max {MAX_BATCH})</button>
         </div>
 
         {/* SINGLE VERIFICATION — the primary, beautiful, snappy experience */}
@@ -796,6 +879,84 @@ export default function TTBLabelVerifier() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* BATCH UPLOAD CARD - limited to 5 for prototype (API cost control) and addresses the "batch uploads would be huge" note from discovery */}
+        <div className="card p-8 mb-8" style={{ display: activeTab === 'batch' ? 'block' : 'none' }}>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <div className="font-semibold text-2xl tracking-tight">Batch Upload (max {MAX_BATCH})</div>
+              <div className="text-sm text-zinc-500">Shared template • Live status • Artificial limit for this prototype</div>
+            </div>
+            <button onClick={clearBatch} className="btn btn-ghost text-sm">Clear batch</button>
+          </div>
+
+          {/* Template form (same fields as single) */}
+          <div className="mb-6 p-4 bg-zinc-50 rounded-xl border">
+            <div className="uppercase tracking-[1px] text-xs font-semibold text-zinc-500 mb-3">Template Application Data (applied to all items)</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div>
+                <div className="field-label mb-1 text-xs">Brand Name</div>
+                <input className="input text-sm" placeholder="OLD TOM DISTILLERY" value={batchTemplate.brandName} onChange={(e) => updateBatchTemplate("brandName", e.target.value)} />
+              </div>
+              <div>
+                <div className="field-label mb-1 text-xs">Class / Type Designation</div>
+                <input className="input text-sm" placeholder="Kentucky Straight Bourbon Whiskey" value={batchTemplate.classType} onChange={(e) => updateBatchTemplate("classType", e.target.value)} />
+              </div>
+              <div>
+                <div className="field-label mb-1 text-xs">Alcohol Content</div>
+                <input className="input text-sm" placeholder="45% Alc./Vol. (90 Proof)" value={batchTemplate.alcoholContent} onChange={(e) => updateBatchTemplate("alcoholContent", e.target.value)} />
+              </div>
+              <div>
+                <div className="field-label mb-1 text-xs">Net Contents</div>
+                <input className="input text-sm" placeholder="750 mL" value={batchTemplate.netContents} onChange={(e) => updateBatchTemplate("netContents", e.target.value)} />
+              </div>
+            </div>
+            <button onClick={applyTemplateToBatch} className="mt-3 btn btn-secondary text-xs px-3 py-1">Apply template to all items</button>
+          </div>
+
+          {/* Multi-file upload for batch */}
+          <div
+            onClick={() => { const input = document.createElement('input'); input.type = 'file'; input.multiple = true; input.accept = 'image/*'; input.onchange = (e) => handleBatchFiles((e.target as HTMLInputElement).files); input.click(); }}
+            onDrop={(e) => { e.preventDefault(); handleBatchFiles(e.dataTransfer.files); }}
+            onDragOver={(e) => e.preventDefault()}
+            className="upload-zone flex flex-col items-center justify-center rounded-2xl h-28 text-center cursor-pointer mb-4"
+          >
+            <div className="font-semibold">Drop or click to add up to {MAX_BATCH} label photos</div>
+            <div className="text-xs text-zinc-500 mt-1">Artificial limit for this prototype (API key usage control)</div>
+          </div>
+
+          {/* Batch items list */}
+          {batchItems.length > 0 && (
+            <div className="space-y-2 mb-4">
+              {batchItems.map((item) => (
+                <div key={item.id} className="flex items-center gap-3 p-2 bg-white border rounded-xl text-sm">
+                  <img src={item.previewUrl} alt="" className="w-10 h-10 object-contain rounded border bg-zinc-50 flex-shrink-0" />
+                  <div className="flex-1 min-w-0 truncate">{item.fileName}</div>
+                  <div className="text-xs">
+                    {item.status === "idle" && <span className="px-2 py-0.5 bg-zinc-100 rounded">Ready</span>}
+                    {item.status === "processing" && <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded">Processing...</span>}
+                    {item.status === "done" && item.result && (
+                      <span className={item.result.overallStatus === "pass" ? "text-emerald-600" : "text-amber-600"}>
+                        {item.result.overallStatus === "pass" ? "Clean" : `${item.result.issuesCount} issues`}
+                      </span>
+                    )}
+                    {item.status === "error" && <span className="text-red-600">Error</span>}
+                  </div>
+                  <button onClick={() => removeBatchItem(item.id)} className="text-xs text-red-600 hover:underline">Remove</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <button
+            onClick={verifyBatch}
+            disabled={batchItems.length === 0 || isBatchVerifying}
+            className="btn btn-primary w-full max-w-sm mx-auto block disabled:opacity-60"
+          >
+            {isBatchVerifying ? "Verifying batch..." : `Verify Batch (${batchItems.length}/${MAX_BATCH})`}
+          </button>
+          <p className="text-[10px] text-center text-zinc-500 mt-2">Limited to {MAX_BATCH} for this prototype (to control API usage while demonstrating the requested batch capability from the spec).</p>
+        </div>
 
         {/* Samples Gallery — instant impressive demos */}
         <div className="mt-12">

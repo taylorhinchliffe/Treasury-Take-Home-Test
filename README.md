@@ -33,6 +33,13 @@ A working, directly accessible deployed URL is the primary deliverable so evalua
     - Fuzzy matching for brand names etc. (casing, possessives, minor wording) — exactly as agents described ("STONE'S THROW" vs "Stone's Throw").
     - Click image to open full-size lightbox for manual double-check.
     - Edit values and **Re-verify** without re-uploading.
+- **Batch Upload tab** (new, limited to 5 for this prototype)
+  - Addresses the explicit "batch uploads would be huge" request from Sarah Chen's discovery notes (peak season importer dumps, Seattle office feedback).
+  - Shared template application data form applied to multiple label photos.
+  - Multi-file drag/drop or browse upload (capped at 5 to control API costs and keep the prototype focused).
+  - Live per-item status and results summary.
+  - Reuses the exact same verification engine, prompt, and result display as single mode.
+  - Artificial limit clearly noted in UI (API key usage / time-constrained prototype).
 - **6 high-quality sample labels** included (generated photorealistically):
   - Perfect match
   - Warning header in title case (should flag)

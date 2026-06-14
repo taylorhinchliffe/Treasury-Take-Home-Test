@@ -37,6 +37,7 @@ export interface BatchItem {
   file: File | null; // null after processed for memory
   fileName: string;
   previewUrl: string; // local object URL
+  dataUrl: string;    // resized data URL for the API call
   data: ApplicationData;
   result?: VerificationResult;
   status: "idle" | "processing" | "done" | "error";
