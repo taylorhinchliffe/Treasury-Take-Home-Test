@@ -550,15 +550,15 @@ export default function TTBLabelVerifier() {
               {/* Bottle with reading glasses - "proof reading" the label (pun + Culture Mind energy) */}
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
-                className="h-7 w-7" 
+                className="h-8 w-8" 
                 viewBox="0 0 24 24" 
                 fill="none" 
                 stroke="currentColor" 
-                strokeWidth="1.2" 
+                strokeWidth="1.1" 
                 strokeLinecap="round" 
                 strokeLinejoin="round"
               >
-                <g transform="scale(1.12) translate(-1.3 -1.3)">
+                <g transform="scale(1.15) translate(-1.5 -1.5)">
                   {/* Bottle body - bourbon style */}
                   <rect x="5.5" y="7.5" width="13" height="13.5" rx="2" />
                   {/* Neck */}
