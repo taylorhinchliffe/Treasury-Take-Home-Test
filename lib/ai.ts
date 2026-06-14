@@ -35,7 +35,7 @@ function getClient() {
 
   if (!xaiKey && !openaiKey) {
     throw new Error(
-      "Missing API key. Set XAI_API_KEY (preferred) or OPENAI_API_KEY in .env.local"
+      "Missing API key. Set XAI_API_KEY (preferred) or OPENAI_API_KEY in .env.local (for local) or in your Vercel project Environment Variables."
     );
   }
 

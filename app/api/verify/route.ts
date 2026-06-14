@@ -39,13 +39,21 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ result });
   } catch (err: any) {
-    console.error("Verify error:", err);
+    console.error("Verify error (full):", err);
 
-    const message =
-      err?.message?.includes("API key") || err?.message?.includes("key")
-        ? "API key is missing or invalid. Add XAI_API_KEY or OPENAI_API_KEY to your environment."
-        : err?.message || "Unexpected error during verification. Please try again.";
+    const rawMessage = err?.message || "";
+    const lower = rawMessage.toLowerCase();
 
-    return NextResponse.json({ error: message }, { status: 500 });
+    let userMessage: string;
+
+    if (lower.includes("missing api key") || lower.includes("set xai_api_key") || lower.includes("set openai_api_key")) {
+      userMessage = "API key is missing. In Vercel, go to your project Settings → Environment Variables, add XAI_API_KEY (with value from https://console.x.ai), make sure Production is checked, then redeploy the project.";
+    } else if (lower.includes("api key") || lower.includes("authentication") || lower.includes("invalid") || lower.includes("unauthorized") || lower.includes("quota") || lower.includes("credit") || lower.includes("billing") || lower.includes("insufficient")) {
+      userMessage = "Problem with the AI provider (likely invalid/expired key, insufficient credits, or rate limit). Double-check that the XAI_API_KEY value in Vercel is correct and that your xAI account has available balance, then redeploy and try again.";
+    } else {
+      userMessage = rawMessage || "Unexpected error during verification. Please try again.";
+    }
+
+    return NextResponse.json({ error: userMessage }, { status: 500 });
   }
 }

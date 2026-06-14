@@ -638,7 +638,11 @@ export default function TTBLabelVerifier() {
               )}
             </button>
             {!canVerify && (
-              <p className="text-xs text-zinc-500 mt-2">Add a label photo and at least Brand + Class/Type to enable verification.</p>
+              <p className="text-xs text-zinc-500 mt-2">
+                {imageDataUrl
+                  ? "Image ready. Fill in at least Brand Name and Class/Type on the left (the values submitted in the application) to enable verification."
+                  : "Add a label photo and at least Brand + Class/Type to enable verification."}
+              </p>
             )}
           </div>
 
