@@ -4,7 +4,7 @@
 
 *(Named in the grand tradition of Iain M. Banks Culture series Minds — dry, sarcastic, and just a little disappointed in your label formatting.)*
 
-Built as a take-home assessment for the IT Specialist (AI) position, Treasury Common Services Center / TTB Label Compliance.
+Created with Grok 4.3 Build as a take-home assessment for the IT Specialist (AI) position, Treasury Common Services Center / TTB Label Compliance.
 
 A working, directly accessible deployed URL is the primary deliverable so evaluators can immediately test the tool with real (or sample) labels.
 
@@ -141,19 +141,40 @@ After adding the variable:
 - Vercel will usually show a prompt like **"Redeploy with new environment variables?"** — click **Yes** / Redeploy.
 - If it doesn't prompt: Go to the **Deployments** tab for the project → find the latest deployment → click the three dots `⋯` → choose **Redeploy**.
 
-### Step 4: Get your production URL and test it
+### Step 4: Get your production URL and test it (make it publicly accessible)
 
-1. Once the redeploy finishes successfully (green check), go to the **Deployments** or main project page.
-2. Copy the **Production** URL (it will look like `https://very-little-proof-indeed-xxx.vercel.app` or a custom domain if you set one).
-3. Open the URL in a new tab.
-4. Test it:
-   - The site should load cleanly.
-   - Click any of the **Sample** cards at the bottom (especially "Load + Verify").
-   - You should see the form populate + results appear within a few seconds (with the famous Culture-style name in the header).
+1. Once the redeploy finishes successfully (green check), go to the **Deployments** tab or the main project page in Vercel.
+2. Look for the deployment labeled **Production** (not a Preview or branch-specific one). The correct public URL will be something like:
+   - `https://your-project-name.vercel.app` (the main production domain)
+   - Or your custom domain if you've added one.
+3. **Important for public access (no login required)**:
+   - By default Vercel production deployments are public.
+   - If clicking the URL in an incognito/private window asks you to log in to Vercel, **Vercel Authentication** (or Password Protection) is likely enabled on the project.
+   - Fix it:
+     1. In your Vercel project, go to **Settings → General**.
+     2. Scroll to **Vercel Authentication** (or look for "Password Protection" / "Access Control").
+     3. Turn it **Off** (or "Disable").
+     4. Save the change.
+     5. Go back to **Deployments**, click the three dots `⋯` on your latest Production deployment → **Redeploy**.
+   - After this, the URL should load for anyone (including Treasury evaluators in private/incognito browsers) without requiring a Vercel login.
+4. Copy the clean **Production** URL from the dashboard (use the one that does **not** contain a branch name like `git-...` or your username in the subdomain).
+5. Test it thoroughly in an incognito/private window:
+   - The site should load with no login prompt.
+   - Try the **Batch** tab and the bottom **Batch Example** buttons ("Load" / "Load + Verify").
+   - Try the **Sample Labels** under the Single tab.
+   - Verify that the AI (Grok 4.3) actually runs and returns results.
 
-If the samples give an error about missing API key, double-check the variable name is exactly `XAI_API_KEY` and that you redeployed after adding it.
+**If you want a nicer/custom domain** (optional but recommended for the submission):
+- In Vercel project → **Settings → Domains**.
+- Add a custom domain you own (you can buy one cheaply from Namecheap, Google, etc., or use a free one if available).
+- Follow Vercel's DNS instructions (usually just add a CNAME or A record).
+- Once verified and SSL is issued (automatic), use the custom domain as your "Deployed Application URL".
 
-The live site uses the key you configured in Vercel. **Evaluators do not need their own key** — the app will just work when they open the link.
+The live site uses the `XAI_API_KEY` (or `OPENAI_API_KEY`) you configured in Vercel Environment Variables (under Production). **Treasury evaluators do not need their own key** — the working prototype should be directly testable at the public URL.
+
+Submit this public Production URL on the form: https://forms.osi.office365.us/r/xWrQGduMw7
+
+If you're still seeing a login prompt after disabling authentication and redeploying, double-check that you're using the **Production** domain (not a preview URL) and that the key is set for the Production environment. Let me know the exact URL you're trying if you need more help!
 
 ### Updated High-Level Flow (Summary)
 
