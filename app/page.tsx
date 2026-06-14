@@ -550,11 +550,11 @@ export default function TTBLabelVerifier() {
               {/* Bottle with reading glasses - "proof reading" the label (pun + Culture Mind energy) */}
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
-                className="h-5 w-5" 
+                className="h-6 w-6" 
                 viewBox="0 0 24 24" 
                 fill="none" 
                 stroke="currentColor" 
-                strokeWidth="1.9" 
+                strokeWidth="1.5" 
                 strokeLinecap="round" 
                 strokeLinejoin="round"
               >
