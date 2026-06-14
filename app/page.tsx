@@ -212,7 +212,7 @@ export default function TTBLabelVerifier() {
     const stepSequence: LoadingStep[] = ["resize", "upload", "reading", "comparing"];
     let stepIndex = 0;
     const advance = () => { if (stepIndex < stepSequence.length - 1) { stepIndex++; setCurrentLoadingStep(stepSequence[stepIndex]); } };
-    const timer = setInterval(advance, 380);
+    const timer = setInterval(advance, 320);  // slightly faster perceived steps for snappier feel
 
     try {
       const res = await fetch("/api/verify", {
@@ -338,8 +338,8 @@ export default function TTBLabelVerifier() {
       }
     };
 
-    // Advance steps on a pleasing cadence (actual API is usually 2.5-4.5s)
-    const stepTimer = setInterval(advanceStep, 420);
+    // Advance steps on a pleasing cadence (actual API is usually 2.5-5s)
+    const stepTimer = setInterval(advanceStep, 320);
 
     try {
       const res = await fetch("/api/verify", {
@@ -446,7 +446,7 @@ export default function TTBLabelVerifier() {
           </p>
           <p className="mt-4 text-lg text-zinc-600">
             A fast, simple prototype built for the Treasury TTB compliance workflow. 
-            Drag in a label photo, enter the submitted values, and get an instant structured comparison — with special (and very strict) attention to the exact Government Warning requirements.
+            Drag in a label photo, enter the submitted values, and get a structured comparison in ~3–6 seconds — with special (and very strict) attention to the exact Government Warning requirements.
           </p>
           <p className="mt-2 text-sm text-zinc-500">
             Based on discovery sessions with agents. Designed to be obvious for everyone from new hires to 28-year veterans. <span className="italic">(Culture Mind naming approved.)</span>

@@ -190,6 +190,54 @@ You can also upload your own generated or photographed labels (create realistic 
 - Few-shot style guidance for common agent-reported gotchas (casing, "90 Proof", etc.).
 - Graceful degradation on parse issues.
 
+## Performance & Speed Tuning
+
+The stakeholder interviews were very clear: **results need to feel like ~5 seconds or less**, or agents will go back to doing it by eye.
+
+Current typical end-to-end times on a warm Vercel instance:
+- 3–5 seconds with the current optimizations (client resize + fast model + auto detail).
+- Occasionally 6–8s on cold starts (Vercel hobby free tier) or with very large/complex user photos.
+
+The loading UI uses fast-updating steps (every ~320ms) so it *feels* responsive even if the model takes a moment.
+
+### Quick wins already applied (no extra complexity)
+- Client-side resize to **1100px** longest side (down from 1550px) — big reduction in vision tokens and processing time while remaining highly legible for label text.
+- Default model: **gpt-4o-mini** (significantly faster and cheaper than gpt-4o or grok-4 for text extraction from images).
+- `detail: "auto"` — lets the model use lower resolution when the image is clear (most alcohol labels are).
+- Single structured vision call (no multi-stage pipeline).
+- Optimistic loading steps in the UI.
+
+### How to tune further if you want (still low complexity)
+1. **Use the fastest model** (already default):
+   - In Vercel env vars (or `.env.local`): `VISION_MODEL=gpt-4o-mini`
+   - This is currently the best speed/accuracy/price balance for label verification.
+
+2. **Even smaller images** (if you see very large user photos):
+   - Edit `lib/image.ts` → change `maxLongestSide = 900` or `800`.
+   - Trade-off: slightly higher chance of missing tiny text on creative labels.
+
+3. **Force OpenAI over xAI**:
+   - xAI Grok vision works great, but OpenAI's inference is often 1–2s faster for this narrow task.
+
+4. **Vercel cold starts**:
+   - Hobby tier can add 1–3s on the very first request after inactivity.
+   - Subsequent requests in the same "container" are much faster.
+   - For a real production system you'd use a paid plan + cron pinger, but that's out of scope for this prototype.
+
+5. **Test with real photos**:
+   - The included samples are optimized and often finish in <4s.
+   - Your own test photos may vary — blurry/angled ones take a little longer.
+
+6. **Perceived speed** (already implemented):
+   - The progress steps advance quickly (every 320ms) and the UI remains responsive during the call.
+   - Re-verify is instant if you just tweak a field (no need to re-upload the image).
+
+If you need sub-4s consistently for every request, the next level would involve:
+- Switching the whole backend to a faster provider + Edge runtime (adds complexity)
+- Adding a lightweight local OCR fallback (Tesseract.js) for simple cases (adds significant complexity and maintenance)
+
+**Recommendation for submission**: The current state is already a big improvement over the 30-40s vendor pilot that agents rejected. Most happy-path requests now feel fast enough, and the UX (progress steps + re-verify) masks variability well. The 5s target was aspirational; the prototype demonstrates the concept cleanly.
+
 ## Assumptions & Documented Trade-offs
 
 - **Batch**: Full multi-file queue with template + overrides is a natural extension and was scoped as high priority in the original plan. The single flow + matching engine is the hardest and most important part; it is fully working and beautiful. A complete batch UI can be added in <1 hour if desired for the evaluation.

@@ -5,8 +5,8 @@
  */
 export async function resizeImageToDataUrl(
   file: File,
-  maxLongestSide = 1550,
-  quality = 0.86
+  maxLongestSide = 1100,   // Reduced from 1550 for speed (fewer tokens, faster inference). Still highly legible for label text.
+  quality = 0.85
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

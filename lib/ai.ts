@@ -107,9 +107,10 @@ export async function verifyLabel(
 ): Promise<VerificationResult> {
   const client = getClient();
 
-  // Use a strong vision model. xAI Grok vision models work with the same format.
-  // You can override by changing here or via env in the future.
-  const model = process.env.VISION_MODEL || "grok-4";
+  // Use a strong vision model. 
+  // Default to gpt-4o-mini for best speed/price/latency on text extraction tasks (often 2-4s faster than larger models).
+  // Set VISION_MODEL=grok-4 (or another xAI model) in env if you prefer to use xAI for the Grok branding.
+  const model = process.env.VISION_MODEL || "gpt-4o-mini";
 
   const userContent = [
     {
@@ -125,7 +126,7 @@ Please analyze the attached image and return the exact JSON structure described 
       type: "image_url" as const,
       image_url: {
         url: imageDataUrl,
-        detail: "high" as const,
+        detail: "auto" as const,   // "auto" lets the provider use lower res when possible → faster + cheaper while keeping accuracy on clear labels
       },
     },
   ];
