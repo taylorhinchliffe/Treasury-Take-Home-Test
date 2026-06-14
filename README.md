@@ -223,6 +223,6 @@ Thank you for the opportunity to build something useful for the agents doing thi
 
 ---
 
-**Local development note**: You must have a valid `XAI_API_KEY` or `OPENAI_API_KEY` in `.env.local` for the `/api/verify` route to succeed with arbitrary images. The 6 included samples are the fastest way to experience the full intended behavior.
+**Local development note**: You must have a valid `XAI_API_KEY` (preferred) or `OPENAI_API_KEY` in `.env.local` for the `/api/verify` route to succeed with arbitrary uploads. The 6 included samples are the fastest way to experience the full intended behavior (and they look great with the new name in the header).
 
-Built with care for clarity, speed, and the people who will actually use it.
+Built with care for clarity, speed, and the people who will actually use it. (And named with just a *very little* proof indeed.)

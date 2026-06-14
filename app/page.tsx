@@ -458,7 +458,7 @@ export default function TTBLabelVerifier() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <div className="font-semibold text-2xl tracking-tight">Single Label Verification</div>
-              <div className="text-sm text-zinc-500">Primary workflow • Fast • Clear results</div>
+              <div className="text-sm text-zinc-500">Primary workflow • Fast • Clear results • <span className="italic">Very Little Proof Indeed</span></div>
             </div>
             <button onClick={resetSingle} className="btn btn-ghost text-sm">Clear form</button>
           </div>
