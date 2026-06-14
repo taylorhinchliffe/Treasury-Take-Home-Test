@@ -165,6 +165,7 @@ export default function TTBLabelVerifier() {
   const [batchItems, setBatchItems] = useState<BatchItem[]>([]);
   const [batchTemplate, setBatchTemplate] = useState<ApplicationData>(clone(emptyApplicationData));
   const [isBatchVerifying, setIsBatchVerifying] = useState(false);
+  const [expandedBatchItemIds, setExpandedBatchItemIds] = useState<Set<string>>(new Set());
 
   // === Helpers ===
   const resetSingle = useCallback(() => {
@@ -326,6 +327,18 @@ export default function TTBLabelVerifier() {
     }
     setIsBatchVerifying(false);
     toast.success("Batch complete");
+  };
+
+  const toggleExpandBatchItem = (id: string) => {
+    setExpandedBatchItemIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
   };
 
   // === Image handling (drag + drop + click + resize) ===
@@ -537,7 +550,7 @@ export default function TTBLabelVerifier() {
         </div>
 
         {/* SINGLE VERIFICATION — the primary, beautiful, snappy experience */}
-        <div className="card p-8 mb-8">
+        <div className="card p-8 mb-8" style={{ display: activeTab === 'single' ? 'block' : 'none' }}>
           <div className="flex items-center justify-between mb-6">
             <div>
               <div className="font-semibold text-2xl tracking-tight">Single Label Verification</div>
@@ -925,26 +938,73 @@ export default function TTBLabelVerifier() {
             <div className="text-xs text-zinc-500 mt-1">Artificial limit for this prototype (API key usage control)</div>
           </div>
 
-          {/* Batch items list */}
+          {/* Batch items list - click each to toggle details (initially hidden) */}
           {batchItems.length > 0 && (
             <div className="space-y-2 mb-4">
-              {batchItems.map((item) => (
-                <div key={item.id} className="flex items-center gap-3 p-2 bg-white border rounded-xl text-sm">
-                  <img src={item.previewUrl} alt="" className="w-10 h-10 object-contain rounded border bg-zinc-50 flex-shrink-0" />
-                  <div className="flex-1 min-w-0 truncate">{item.fileName}</div>
-                  <div className="text-xs">
-                    {item.status === "idle" && <span className="px-2 py-0.5 bg-zinc-100 rounded">Ready</span>}
-                    {item.status === "processing" && <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded">Processing...</span>}
-                    {item.status === "done" && item.result && (
-                      <span className={item.result.overallStatus === "pass" ? "text-emerald-600" : "text-amber-600"}>
-                        {item.result.overallStatus === "pass" ? "Clean" : `${item.result.issuesCount} issues`}
-                      </span>
+              {batchItems.map((item) => {
+                const isExpanded = expandedBatchItemIds.has(item.id);
+                return (
+                  <div key={item.id} className="border rounded-xl overflow-hidden bg-white">
+                    <div 
+                      onClick={() => toggleExpandBatchItem(item.id)}
+                      className="flex items-center gap-3 p-2 cursor-pointer hover:bg-zinc-50 text-sm"
+                    >
+                      <img src={item.previewUrl} alt="" className="w-10 h-10 object-contain rounded border bg-zinc-50 flex-shrink-0" />
+                      <div className="flex-1 min-w-0 truncate">{item.fileName}</div>
+                      <div className="text-xs">
+                        {item.status === "idle" && <span className="px-2 py-0.5 bg-zinc-100 rounded">Ready</span>}
+                        {item.status === "processing" && <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded">Processing...</span>}
+                        {item.status === "done" && item.result && (
+                          <span className={item.result.overallStatus === "pass" ? "text-emerald-600" : "text-amber-600"}>
+                            {item.result.overallStatus === "pass" ? "Clean" : `${item.result.issuesCount} issues`}
+                          </span>
+                        )}
+                        {item.status === "error" && <span className="text-red-600">Error</span>}
+                      </div>
+                      <div className="text-xs text-zinc-400">{isExpanded ? '▲' : '▼'} Click for details</div>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); removeBatchItem(item.id); }} 
+                        className="text-xs text-red-600 hover:underline ml-2"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    {isExpanded && item.result && (
+                      <div className="p-3 border-t bg-zinc-50 text-sm">
+                        {item.result.warningFormatting && (
+                          <div className="mb-2">
+                            <div className="font-semibold text-xs mb-1">Government Warning Details:</div>
+                            <div className="text-xs space-x-2">
+                              <span className={item.result.warningFormatting.headerAllCaps ? "text-emerald-600" : "text-red-600"}>Header ALL CAPS: {item.result.warningFormatting.headerAllCaps ? "Yes" : "No"}</span>
+                              <span className={item.result.warningFormatting.appearsBold ? "text-emerald-600" : "text-amber-600"}>Bold: {item.result.warningFormatting.appearsBold ? "Yes" : "Unclear"}</span>
+                              <span className={item.result.warningFormatting.fullTextExact ? "text-emerald-600" : "text-red-600"}>Exact text: {item.result.warningFormatting.fullTextExact ? "Yes" : "No"}</span>
+                            </div>
+                            <div className="text-xs text-zinc-600 mt-1">{item.result.warningFormatting.notes}</div>
+                          </div>
+                        )}
+                        <div>
+                          <div className="font-semibold text-xs mb-1">Field Issues:</div>
+                          {item.result.analyses.filter(a => a.status !== "exact_match").length > 0 ? (
+                            item.result.analyses.map((a, idx) => (
+                              a.status !== "exact_match" && (
+                                <div key={idx} className="text-xs mb-0.5">
+                                  <span className="font-medium">{a.field}:</span> {a.status} - {a.explanation}
+                                </div>
+                              )
+                            ))
+                          ) : (
+                            <div className="text-xs text-emerald-600">No issues - all fields match the template.</div>
+                          )}
+                        </div>
+                        <div className="text-[10px] text-zinc-400 mt-1">Click item header again to collapse.</div>
+                      </div>
                     )}
-                    {item.status === "error" && <span className="text-red-600">Error</span>}
+                    {isExpanded && !item.result && (
+                      <div className="p-3 border-t bg-zinc-50 text-xs text-zinc-500">No result yet (item not verified or errored).</div>
+                    )}
                   </div>
-                  <button onClick={() => removeBatchItem(item.id)} className="text-xs text-red-600 hover:underline">Remove</button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
@@ -958,50 +1018,74 @@ export default function TTBLabelVerifier() {
           <p className="text-[10px] text-center text-zinc-500 mt-2">Limited to {MAX_BATCH} for this prototype (to control API usage while demonstrating the requested batch capability from the spec).</p>
         </div>
 
-        {/* Samples Gallery — instant impressive demos */}
+        {/* Samples / Batch Example at bottom - replaced based on tab */}
         <div className="mt-12">
-          <div className="flex items-end justify-between mb-3">
-            <div>
-              <div className="font-semibold text-xl tracking-tight">Sample Labels</div>
-              <div className="text-sm text-zinc-600">Click any sample to instantly populate the form + photo above. Then hit Verify (or use auto-verify for one-click demo).</div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {SAMPLE_CONFIGS.map((sample) => (
-              <div key={sample.id} className="card overflow-hidden group">
-                <div className="relative">
-                  <img
-                    src={sample.imagePath}
-                    alt={sample.name}
-                    className="w-full h-28 object-cover bg-zinc-100"
-                  />
-                  <div className="absolute top-2 right-2 text-[10px] px-1.5 py-px rounded bg-black/60 text-white font-mono tracking-wider">
-                    {sample.expectedIssues > 0 ? `${sample.expectedIssues} issue${sample.expectedIssues > 1 ? "s" : ""}` : "CLEAN"}
-                  </div>
-                </div>
-                <div className="p-3">
-                  <div className="font-medium text-sm leading-tight mb-0.5">{sample.name}</div>
-                  <div className="text-[11px] text-zinc-500 mb-2 line-clamp-2">{sample.description}</div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => loadSample(sample, false)}
-                      className="flex-1 text-xs btn btn-secondary py-1.5"
-                    >
-                      Load
-                    </button>
-                    <button
-                      onClick={() => loadSample(sample, true)}
-                      className="flex-1 text-xs btn btn-primary py-1.5"
-                    >
-                      Load + Verify
-                    </button>
-                  </div>
+          {activeTab === 'single' ? (
+            <>
+              <div className="flex items-end justify-between mb-3">
+                <div>
+                  <div className="font-semibold text-xl tracking-tight">Sample Labels</div>
+                  <div className="text-sm text-zinc-600">Click any sample to instantly populate the form + photo above. Then hit Verify (or use auto-verify for one-click demo).</div>
                 </div>
               </div>
-            ))}
-          </div>
-          <p className="text-[11px] text-center text-zinc-400 mt-3">Samples were generated to demonstrate the exact requirements and edge cases from the discovery notes (warning formatting, brand nuance, real-world photo challenges).</p>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                {SAMPLE_CONFIGS.map((sample) => (
+                  <div key={sample.id} className="card overflow-hidden group">
+                    <div className="relative">
+                      <img
+                        src={sample.imagePath}
+                        alt={sample.name}
+                        className="w-full h-28 object-cover bg-zinc-100"
+                      />
+                      <div className="absolute top-2 right-2 text-[10px] px-1.5 py-px rounded bg-black/60 text-white font-mono tracking-wider">
+                        {sample.expectedIssues > 0 ? `${sample.expectedIssues} issue${sample.expectedIssues > 1 ? "s" : ""}` : "CLEAN"}
+                      </div>
+                    </div>
+                    <div className="p-3">
+                      <div className="font-medium text-sm leading-tight mb-0.5">{sample.name}</div>
+                      <div className="text-[11px] text-zinc-500 mb-2 line-clamp-2">{sample.description}</div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => loadSample(sample, false)}
+                          className="flex-1 text-xs btn btn-secondary py-1.5"
+                        >
+                          Load
+                        </button>
+                        <button
+                          onClick={() => loadSample(sample, true)}
+                          className="flex-1 text-xs btn btn-primary py-1.5"
+                        >
+                          Load + Verify
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[11px] text-center text-zinc-400 mt-3">Samples were generated to demonstrate the exact requirements and edge cases from the discovery notes (warning formatting, brand nuance, real-world photo challenges).</p>
+            </>
+          ) : (
+            <>
+              <div className="flex items-end justify-between mb-3">
+                <div>
+                  <div className="font-semibold text-xl tracking-tight">Batch Example (5 identical photos)</div>
+                  <div className="text-sm text-zinc-600">This replaces the samples gallery when in Batch tab. 5 copies of one clean sample photo using the shared template (demo of batch processing with no issues).</div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-5 gap-2">
+                {[1,2,3,4,5].map((num) => (
+                  <div key={num} className="card p-2 text-center">
+                    <img src="/samples/perfect-bourbon.jpg" alt={`Batch example item ${num}`} className="w-full h-20 object-contain mx-auto mb-1" />
+                    <div className="text-xs font-medium">Item {num}/5</div>
+                    <div className="text-[10px] text-emerald-600">Matches template ✓</div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[11px] text-center text-zinc-400 mt-3">Example of a clean batch of 5 identical labels. In real use, upload your own and use the template form above for the submitted application data.</p>
+            </>
+          )}
         </div>
 
         <footer className="mt-16 text-center text-xs text-zinc-400">
