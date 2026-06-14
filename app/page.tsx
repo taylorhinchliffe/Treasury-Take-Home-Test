@@ -824,9 +824,10 @@ export default function TTBLabelVerifier() {
           </AnimatePresence>
         </div>
 
-        {/* RESULTS */}
-        <AnimatePresence>
-          {result && (
+        {/* RESULTS - only visible under the Single Label Verification tab */}
+        <div style={{ display: activeTab === 'single' ? 'block' : 'none' }}>
+          <AnimatePresence>
+            {result && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -940,6 +941,7 @@ export default function TTBLabelVerifier() {
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
 
         {/* BATCH UPLOAD CARD - limited to 5 for prototype (API cost control) and addresses the "batch uploads would be huge" note from discovery */}
         <div className="card p-8 mb-8" style={{ display: activeTab === 'batch' ? 'block' : 'none' }}>
@@ -1118,7 +1120,7 @@ export default function TTBLabelVerifier() {
               <div className="flex items-end justify-between mb-3">
                 <div>
                   <div className="font-semibold text-xl tracking-tight">Batch Example (5 identical photos)</div>
-                  <div className="text-sm text-zinc-600">This replaces the samples gallery when in Batch tab. 5 copies of one clean sample photo using the shared template (demo of batch processing with no issues).</div>
+                  <div className="text-sm text-zinc-600">This replaces the samples gallery when in Batch tab. 5 copies of one sample photo using the shared template (test batch example).</div>
                 </div>
               </div>
 
